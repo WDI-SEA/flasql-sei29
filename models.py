@@ -20,6 +20,9 @@ class User(db.Model):
   def __repr__(self):
     return f'User(id={self.id}, email="{self.email}", name="{self.name}", bio="{self.bio}")'
   
+  def as_dict(self):
+    return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+  
 
 post_tags = db.Table('post_tags',
   db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True),
@@ -44,6 +47,14 @@ class Post(db.Model):
   def __repr__(self):
     return f'Post(id={self.id}, header="{self.header}", body="{self.body}", author_id={self.author_id})'
 
+  def as_dict(self):
+    return {
+      'id': self.id,
+      'header': self.header,
+      'body': self.body,
+      'author': self.author.as_dict()['name'],
+    }
+
 
 class Tag(db.Model):
   __tablename__ = 'tags'
@@ -53,3 +64,19 @@ class Tag(db.Model):
 
   def __repr__(self):
     return f'Tag(id={self.id}, tag="{self.tag}")'
+  
+  def as_dict(self):
+    return {'id': self.id, 'tag': self.tag}
+
+
+def get_or_create(model, defaults=None, **kwargs):
+  instance = db.session.query(model).filter_by(**kwargs).first()
+  if instance:
+    return instance, False
+  else:
+    params = dict((k, v) for k, v in kwargs.items())
+    params.update(defaults or {})
+    instance = model(**params)
+    db.session.add(instance)
+    db.session.commit()
+    return instance, True
