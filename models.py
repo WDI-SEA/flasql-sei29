@@ -19,6 +19,11 @@ class User(db.Model):
 
   def __repr__(self):
     return f'User(id={self.id}, email="{self.email}", name="{self.name}", bio="{self.bio}")'
+
+  def as_dict(self):
+    for c in self.__table__.columns:
+      print(f"💽 c is {c}")
+    return {c.name: getattr(self, c.name) for c in self.__table__.columns}
   
 
 post_tags = db.Table('post_tags',
