@@ -1,9 +1,6 @@
 from flask import jsonify, redirect
+from helpers import InvalidUsage
 from models import db, User
-
-def error(err_locale, error):
-  print(f'💩 Error in {err_locale}\n{error}')
-  return jsonify(error='Server Error')
 
 # Index
 def get_all_users():
@@ -12,7 +9,8 @@ def get_all_users():
     results = [user.as_dict() for user in all_users]
     return jsonify(results)
   except Exception as error:
-    return error('getting all users', error)
+    print(error.to_dict())
+    return error.client_view()
 
 # Show
 def get_user(id):
@@ -22,9 +20,10 @@ def get_user(id):
     if user:
       return jsonify(user.as_dict())
     else:
-      raise Exception('No user at that id')
+      raise InvalidUsage('No user at that id')
   except Exception as error:
-    return error('getting one user', error)
+    print(error.to_dict())
+    return error.client_view()
 
 # Create
 def create_user(name, email, bio):
@@ -34,7 +33,8 @@ def create_user(name, email, bio):
     db.session.commit()
     return jsonify(new_user.as_dict())
   except Exception as error:
-    return error('creating a user', error)
+    print(error.to_dict())
+    return error.client_view()
 
 # Update function!
 def update_user(id, name, email, bio):
@@ -48,10 +48,11 @@ def update_user(id, name, email, bio):
       return jsonify(user.as_dict())
       # return redirect(f'/users/{id}')
     else:
-      # return error('updating one user', 'No user at that id')
-      return jsonify(message="no user here")
+      # return jsonify(error.to_dict())
+      raise InvalidUsage('No User here!')
   except Exception as error:
-    return error('updating a user', error)
+    print(error.to_dict())
+    return error.client_view()
 
 # Destroy
 def destroy_user(id):
@@ -62,6 +63,7 @@ def destroy_user(id):
       db.session.commit()
       return redirect('/users')
     else:
-      return error('deleting one user', 'No user at that id')
+      raise InvalidUsage('No user here')
   except Exception as error:
-    return error('deleting a user', error)
+    print(error.to_dict())
+    return error.client_view()

@@ -1,11 +1,7 @@
 from models import app
+from helpers import InvalidUsage
 from flask import jsonify, request
 from crud.user_crud import get_all_users, get_user, create_user, destroy_user, update_user
-
-# Helper funct
-def error(err_locale, error):
-  print(f'💩 Error in {err_locale}\n{error}')
-  return jsonify(error='Server Error')
 
 @app.route('/users', methods=['GET', 'POST'])
 def user_index_create():
@@ -13,7 +9,8 @@ def user_index_create():
     try:
       return get_all_users()
     except Exception as error:
-      return error('GET /users route', error)
+      print(error.to_dict())
+      return error.client_view()
   if request.method == 'POST':
     try:
       return create_user(
@@ -21,8 +18,9 @@ def user_index_create():
         email=request.form['email'], 
         bio=request.form['bio']
       )
-    except Exception as err:
-      return error('POST /users route', error)
+    except Exception as error:
+      print(error.to_dict())
+      return error.client_view()
 
 
 @app.route('/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -31,7 +29,8 @@ def user_show_update_delete(id):
     try:
       return get_user(id)
     except Exception as error:
-      return error('GET /users/:id route', error)
+      print(error.to_dict())
+      return error.client_view()
   if request.method == 'PUT':
     try:
       return update_user(
@@ -41,9 +40,11 @@ def user_show_update_delete(id):
         bio=request.form['bio']
       )
     except Exception as error:
-      return error('PUT /users/:id route', error)
+      print(error.to_dict())
+      return error.client_view()
   if request.method == 'DELETE':
     try:
       return destroy_user(id)
     except Exception as error:
-      return error('DELETE /users/:id route', error)
+      print(error.to_dict())
+      return error.client_view()
