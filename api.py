@@ -13,7 +13,11 @@ def user_index_create():
   if request.method == 'GET':
     return get_all_users()
   if request.method == 'POST':
-    return create_user()
+    return create_user(
+      name=request.form['name'],
+      email=request.form['email'],
+      bio=request.form['bio']
+    )
 
 
 @app.route('/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
