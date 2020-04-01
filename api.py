@@ -2,6 +2,7 @@ from models import app
 from flask import jsonify, request
 from crud.user_crud import get_all_users, get_user, create_user, destroy_user, update_user
 from crud.post_crud import get_all_posts, get_post, create_post, destroy_post, update_post
+from crud.tag_crud import get_all_tags, get_posts_by_tag, destroy_tag
 
 @app.errorhandler(Exception)
 def unhandled_exception(e):
@@ -40,6 +41,22 @@ def post_show_update_delete(id):
   if request.method == 'GET':
     return get_post(id)
   if request.method == 'PUT':
-    return update_post(id, **request.form)
+    update_deets = {**request.form}
+    if request.form['tags']:
+      update_deets['tags'] = [tag.strip() for tag in request.form['tags'].split(',')]
+    # Love this
+    return update_post(id, **update_deets)
   if request.method == 'DELETE':
     return destroy_post(id)
+
+@app.route('/tags')
+def tags_index():
+  return get_all_tags()
+
+# Main usage of Tag functionality
+@app.route('/tags/<int:id>', methods=['GET', 'DELETE'])
+def post_by_tag_destroy_tag(id):
+  if request.method == 'GET':
+    return get_posts_by_tag(id)
+  if request.method == 'DELETE':
+    return destroy_tag(id)

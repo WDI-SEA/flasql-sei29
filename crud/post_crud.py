@@ -32,6 +32,8 @@ def update_post(id, **form_kwargs):
   post = Post.query.get(id)
   if post:
     for k, v in form_kwargs.items():
+      if k == 'tags':
+        v = [get_or_create(Tag, tag=tag)[0] for tag in v]
       setattr(post, k, v)
     db.session.commit()
     return redirect(f'/posts/{id}')
