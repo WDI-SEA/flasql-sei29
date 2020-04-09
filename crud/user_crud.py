@@ -20,10 +20,16 @@ def get_user(id):
 
 # Create
 def create_user(**form_args):
+  if not form_args['name'] or not form_args['email'] or not form_args['password']:
+    raise Exception('Name, email, and password are required fields')
+  if User.query.filter_by(name=form_args['name']).first() is not None:
+    raise Exception('There is already a user with this email')
+
   new_user = User(**form_args)
+  new_user.set_password(form_args['password'])
   db.session.add(new_user)
   db.session.commit()
-  return jsonify(new_user.as_dict())
+  return jsonify(new_user.as_dict(), 201)
 
 # Update function!
 def update_user(id, **update_values):

@@ -1,14 +1,34 @@
-from models import app
-from flask import jsonify, request
+from models import app, User
+from flask import jsonify, request, g
 from crud.user_crud import get_all_users, get_user, create_user, destroy_user, update_user
 from crud.post_crud import get_all_posts, get_post, create_post, destroy_post, update_post
 from crud.tag_crud import get_all_tags, get_posts_by_tag, destroy_tag
+from flask_httpauth import HTTPBasicAuth
 
+auth = HTTPBasicAuth()
+
+# App setup
 @app.errorhandler(Exception)
 def unhandled_exception(e):
   app.logger.error('Unhandled Exception: %s', (e))
   message_str = e.__str__()
   return jsonify(message=message_str.split(':')[0])
+
+@auth.verify_password
+def verify_password(email, password):
+    print('🍟')
+    print(email)
+    print(password)
+    user = User.query.filter_by(email = email).first()
+    if not user or not user.verify_password(password):
+        return False
+    g.user = user
+    return True
+
+@app.route('/api/protected')
+@auth.login_required
+def get_resource():
+    return jsonify({ 'data': 'Hello, %s!' % g.user.name })
 
 @app.route('/users', methods=['GET', 'POST'])
 def user_index_create():
