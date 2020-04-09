@@ -1,5 +1,5 @@
 import json
-from flask import jsonify, redirect
+from flask import jsonify, redirect, g
 from models import db, get_or_create, User, Post, Tag
 
 def get_all_posts():
@@ -21,7 +21,7 @@ def get_post(id):
     raise Exception('Error getting post at {}'.format(id))
 
 def create_post(tags, **post_kwargs):
-  new_post = Post(**post_kwargs)
+  new_post = Post(**post_kwargs, author=g.user)
   # Assuming tags is a list of strings
   new_post.tags = [get_or_create(Tag, tag=tag)[0] for tag in tags]
   db.session.add(new_post)
@@ -30,7 +30,7 @@ def create_post(tags, **post_kwargs):
 
 def update_post(id, **form_kwargs):
   post = Post.query.get(id)
-  if post:
+  if post and post.author.id == g.user.id:
     for k, v in form_kwargs.items():
       if k == 'tags':
         v = [get_or_create(Tag, tag=tag)[0] for tag in v]
@@ -42,7 +42,7 @@ def update_post(id, **form_kwargs):
 
 def destroy_post(id):
   post = Post.query.get(id)
-  if post:
+  if post and post.author.id == g.user.id:
     db.session.delete(post)
     db.session.commit()
     return redirect('/posts')

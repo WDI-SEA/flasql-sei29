@@ -5,7 +5,7 @@ from crud.post_crud import get_all_posts, get_post, create_post, destroy_post, u
 from crud.tag_crud import get_all_tags, get_posts_by_tag, destroy_tag
 from flask_httpauth import HTTPTokenAuth
 from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
+                        as Serializer, BadSignature, SignatureExpired)
 
 auth = HTTPTokenAuth('Bearer')
 
@@ -50,34 +50,42 @@ def user_index_create():
   if request.method == 'GET':
     return get_all_users()
   if request.method == 'POST':
-    print(request.form)
     return create_user(**request.form)
 
-@app.route('/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/users/<int:id>')
+def user_show(id):
+  return get_user(id)
+
+@app.route('/users/<int:id>', methods=['PUT', 'DELETE'])
+@auth.login_required
 def user_show_update_delete(id):
-  if request.method == 'GET':
-    return get_user(id)
   if request.method == 'PUT':
     return update_user(id, **request.form)
   if request.method == 'DELETE':
     return destroy_user(id)
 
-@app.route('/posts', methods=['GET', 'POST'])
-def post_index_create():
-  if request.method == 'GET':
-    return get_all_posts()
-  if request.method == 'POST':
-    post_dict = {**request.form}
-    post_dict['tags'] = [tag.strip() for tag in request.form['tags'].split(',')]
-    return create_post(**post_dict)
+@app.route('/posts')
+def post_index():
+  return get_all_posts()
 
-@app.route('/posts/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-def post_show_update_delete(id):
-  if request.method == 'GET':
-    return get_post(id)
+@app.route('/posts', methods=['POST'])
+@auth.login_required
+def post_create():
+  post_dict = {**request.form}
+  if request.form.get('tags') is not None:
+    post_dict['tags'] = [tag.strip() for tag in request.form['tags'].split(',')]
+  return create_post(**post_dict)
+
+@app.route('/posts/<int:id>')
+def post_show(id):
+  return get_post(id)
+
+@app.route('/posts/<int:id>', methods=['PUT', 'DELETE'])
+@auth.login_required
+def post_update_delete(id):
   if request.method == 'PUT':
     update_deets = {**request.form}
-    if request.form['tags']:
+    if request.form.get('tags') is not None:
       update_deets['tags'] = [tag.strip() for tag in request.form['tags'].split(',')]
     # Love this
     return update_post(id, **update_deets)
@@ -89,9 +97,11 @@ def tags_index():
   return get_all_tags()
 
 # Main usage of Tag functionality
-@app.route('/tags/<int:id>', methods=['GET', 'DELETE'])
-def post_by_tag_destroy_tag(id):
-  if request.method == 'GET':
-    return get_posts_by_tag(id)
-  if request.method == 'DELETE':
-    return destroy_tag(id)
+@app.route('/tags/<int:id>')
+def index_posts_by_tag(id):
+  return get_posts_by_tag(id)
+
+@app.route('/tags/<int:id>', methods=['DELETE'])
+@auth.login_required
+def destroy_tag(id):
+  return destroy_tag(id)

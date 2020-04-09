@@ -1,8 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -37,7 +36,7 @@ class User(db.Model):
     return pwd_context.verify(typed_password, self.password)
 
   # expiration time is in seconds
-  def generate_token(self, expiration=60*30):
+  def generate_token(self, expiration=60*10):
     s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
     return s.dumps({ 'id': self.id })
   
