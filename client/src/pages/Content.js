@@ -11,7 +11,7 @@ export default function Content(props) {
   return (
     <div className="App-content">
       <Switch>
-        <Route exact path="/" render={() => <Home user={props.user} />} /> />
+        <Route exact path="/" render={() => <Home user={props.user} token={props.token} />} /> />
         <Route path='/auth' render={() => <Auth user={props.user} setUserToken={props.setUserToken} />} /> />
         <Route path="/posts/add" render={() => <NewPost user={props.user} />} />
         <Route path="/posts/:id" render={() => <ShowPost user={props.user} />} />

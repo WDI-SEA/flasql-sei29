@@ -10,11 +10,12 @@ function App() {
 
   const setUserToken = (responseData) => {
     if (responseData) {
-      setUser(responseData.user)
+      console.log("🐻")
       setToken(responseData.token)
+      setUser(responseData.user)
     } else {
-      setUser(null)
       setToken(null)
+      setUser(null)
     }
   }
   const updateUser = newUserDeets => {

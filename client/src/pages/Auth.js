@@ -12,7 +12,6 @@ export default function Auth(props) {
     e.preventDefault()
     axios.post(`${process.env.REACT_APP_SERVER_URL}/auth/login`, { email, password })
     .then(response => {
-      console.log(response.data)
       if (response.data.mesage) {
         props.setUserToken(null)
       } else {
@@ -25,12 +24,9 @@ export default function Auth(props) {
     e.preventDefault()
     let payload = {email, password, name}
     if (bio) payload.bio = bio
-    console.log(payload)
 
     axios.post(`${process.env.REACT_APP_SERVER_URL}/users`, payload)
     .then(response => {
-      console.log('🏴‍☠️')
-      console.log(response.data)
       if (response.data.mesage) {
         props.setUserToken(null)
       } else {

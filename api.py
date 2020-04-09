@@ -18,6 +18,7 @@ def unhandled_exception(e):
 
 @auth.verify_token
 def verify_token(token):
+  print(f'💽 {token}')
   s = Serializer(app.config['SECRET_KEY'])
   try:
     data = s.loads(token)

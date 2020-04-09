@@ -9,7 +9,7 @@ export default function Home(props) {
     if (props.user && props.token) {
       axios.get(`${process.env.REACT_APP_SERVER_URL}/api/protected`, {
         headers: {
-          "Authorization": `Bearer ${props.user.token}`
+          "Authorization": `Bearer ${props.token}`
         }
       }).then(response => {
         console.log(response.data)
