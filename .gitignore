@@ -5,3 +5,6 @@ instance/
 .webassets-cache
 .vscode
 .DS_Store
+client/.env
+client/node_modules
+client/yarn.lock

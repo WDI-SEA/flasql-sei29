@@ -30,11 +30,11 @@ def verify_token(token):
 
 @app.route('/auth/login', methods=['POST'])
 def authenticate():
-  if request.form['email'] is None or request.form['password'] is None:
+  if request.json['email'] is None or request.json['password'] is None:
     raise KeyError('Email and Password required')
 
-  user = User.query.filter_by(email=request.form['email']).first()
-  if user is None or not user.verify_password(request.form['password']):
+  user = User.query.filter_by(email=request.json['email']).first()
+  if user is None or not user.verify_password(request.json['password']):
     raise Exception("Unauthorized")
   g.user = user
   token = user.generate_token()
@@ -50,7 +50,7 @@ def user_index_create():
   if request.method == 'GET':
     return get_all_users()
   if request.method == 'POST':
-    return create_user(**request.form)
+    return create_user(**request.json)
 
 @app.route('/users/<int:id>')
 def user_show(id):
@@ -60,7 +60,7 @@ def user_show(id):
 @auth.login_required
 def user_show_update_delete(id):
   if request.method == 'PUT':
-    return update_user(id, **request.form)
+    return update_user(id, **request.json)
   if request.method == 'DELETE':
     return destroy_user(id)
 
@@ -71,9 +71,9 @@ def post_index():
 @app.route('/posts', methods=['POST'])
 @auth.login_required
 def post_create():
-  post_dict = {**request.form}
-  if request.form.get('tags') is not None:
-    post_dict['tags'] = [tag.strip() for tag in request.form['tags'].split(',')]
+  post_dict = {**request.json}
+  if request.json.get('tags') is not None:
+    post_dict['tags'] = [tag.strip() for tag in request.json['tags'].split(',')]
   return create_post(**post_dict)
 
 @app.route('/posts/<int:id>')
@@ -84,9 +84,9 @@ def post_show(id):
 @auth.login_required
 def post_update_delete(id):
   if request.method == 'PUT':
-    update_deets = {**request.form}
-    if request.form.get('tags') is not None:
-      update_deets['tags'] = [tag.strip() for tag in request.form['tags'].split(',')]
+    update_deets = {**request.json}
+    if request.json.get('tags') is not None:
+      update_deets['tags'] = [tag.strip() for tag in request.json['tags'].split(',')]
     # Love this
     return update_post(id, **update_deets)
   if request.method == 'DELETE':
