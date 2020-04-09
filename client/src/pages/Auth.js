@@ -7,7 +7,6 @@ export default function Auth(props) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
-  const [redirect, setRedirect] = useState(false);
 
   const handleLoginSubmit = e => {
     e.preventDefault()
@@ -18,7 +17,6 @@ export default function Auth(props) {
         props.setUserToken(null)
       } else {
         props.setUserToken({ user: response.data.user, token: response.data.token})
-        setRedirect(true)
       }
     }).catch(err=>console.log(err))
   }
@@ -37,12 +35,11 @@ export default function Auth(props) {
         props.setUserToken(null)
       } else {
         props.setUserToken({ user: response.data.user, token: response.data.token})
-        setRedirect(true)
       }
     }).catch(err=>console.log(err))
   }
   
-  if (redirect || props.user) return <Redirect to='/' />
+  if (props.user) return <Redirect to='/' />
 
   return (
     <div className="auth-container">
