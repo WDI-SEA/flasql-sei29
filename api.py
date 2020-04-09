@@ -3,9 +3,11 @@ from flask import jsonify, request, g
 from crud.user_crud import get_all_users, get_user, create_user, destroy_user, update_user
 from crud.post_crud import get_all_posts, get_post, create_post, destroy_post, update_post
 from crud.tag_crud import get_all_tags, get_posts_by_tag, destroy_tag
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPTokenAuth
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 
-auth = HTTPBasicAuth()
+auth = HTTPTokenAuth('Bearer')
 
 # App setup
 @app.errorhandler(Exception)
@@ -14,16 +16,29 @@ def unhandled_exception(e):
   message_str = e.__str__()
   return jsonify(message=message_str.split(':')[0])
 
-@auth.verify_password
-def verify_password(email, password):
-    print('🍟')
-    print(email)
-    print(password)
-    user = User.query.filter_by(email = email).first()
-    if not user or not user.verify_password(password):
-        return False
-    g.user = user
-    return True
+@auth.verify_token
+def verify_token(token):
+  s = Serializer(app.config['SECRET_KEY'])
+  try:
+    data = s.loads(token)
+    g.user = User.query.filter_by(id=data["id"]).first()
+  except SignatureExpired:
+    return False # valid token, but expired
+  except BadSignature:
+    return False # invalid token
+  return True
+
+@app.route('/auth/login', methods=['POST'])
+def authenticate():
+  if request.form['email'] is None or request.form['password'] is None:
+    raise KeyError('Email and Password required')
+
+  user = User.query.filter_by(email=request.form['email']).first()
+  if user is None or not user.verify_password(request.form['password']):
+    raise Exception("Unauthorized")
+  g.user = user
+  token = user.generate_token()
+  return jsonify({ 'token': token.decode('ascii') })
 
 @app.route('/api/protected')
 @auth.login_required

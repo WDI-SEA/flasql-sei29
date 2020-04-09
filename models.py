@@ -8,6 +8,7 @@ app=Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/flasql'
+app.config['SECRET_KEY'] = 'some_SUpER_SecREt_str1NG'
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -34,6 +35,11 @@ class User(db.Model):
 
   def verify_password(self, typed_password):
     return pwd_context.verify(typed_password, self.password)
+
+  # expiration time is in seconds
+  def generate_token(self, expiration=60*30):
+    s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+    return s.dumps({ 'id': self.id })
   
 
 post_tags = db.Table('post_tags',
