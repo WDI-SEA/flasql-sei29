@@ -2,12 +2,17 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask_cors import CORS
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/flasql'
 app.config['SECRET_KEY'] = 'some_SUpER_SecREt_str1NG'
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+
 db = SQLAlchemy(app)
 
 class User(db.Model):

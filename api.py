@@ -34,11 +34,14 @@ def authenticate():
     raise KeyError('Email and Password required')
 
   user = User.query.filter_by(email=request.json['email']).first()
+
   if user is None or not user.verify_password(request.json['password']):
     raise Exception("Unauthorized")
+
   g.user = user
   token = user.generate_token()
-  return jsonify({ 'token': token.decode('ascii') })
+  return jsonify(user=user.as_dict(), token=token.decode('ascii'), status_code=201)
+
 
 @app.route('/api/protected')
 @auth.login_required

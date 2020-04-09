@@ -13,15 +13,28 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+header {
+  background-color: #313b50;
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.nav-elem {
+  text-decoration: none;
+  padding: 1em;
+  color: white;
+  transition: color .4s, letter-spacing .3s;
+  transition-timing-function: ease-in-out;
+}
+
+.nav-elem:hover {
+  color: #61dafb;
+  letter-spacing: .2em;
 }
 
 .App-link {
@@ -35,4 +48,30 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.auth-container {
+  width: 80vw;
+  height: 45vh;
+  display: flex;
+  flex-direction: row;
+  margin: 3em auto;
+  justify-content: space-around;
+  padding: 2em;
+  background: #f8f8f8;
+  border: 2px solid #eeeeee78;
+  box-shadow: 0.5em 0.5em 12px 3px #d7d7d793;
+  border-radius: 1em;
+}
+
+.divider {
+  height: 100%;
+  width: 1em;
+  background-color: #eeeeee78;
+  border-radius: 10%;
+}
+
+.auth-panel form div {
+  padding: 1em;
+  text-align: left;
 }
