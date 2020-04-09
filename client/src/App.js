@@ -8,17 +8,25 @@ function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
 
-  const setUserToken = (imputedUser, imputedToken) => {
-    setUser(imputedUser)
-    setToken(imputedToken)
+  const setUserToken = (responseData) => {
+    if (responseData) {
+      setUser(responseData.user)
+      setToken(responseData.token)
+    } else {
+      setUser(null)
+      setToken(null)
+    }
+  }
+  const updateUser = newUserDeets => {
+    setUser(newUserDeets)
   }
 
   return (
     <Router>
       <div className="App">
-        <Header logout={() => setUserToken(null, null)} user={user} />
+        <Header logout={() => setUserToken(null)} user={user} />
         <main>
-          <Content user={user} setUser={setUser} setToken={setToken} token={token} />
+          <Content user={user} token={token} setUserToken={setUserToken} updateUser={updateUser} />
         </main>
       </div>
     </Router>

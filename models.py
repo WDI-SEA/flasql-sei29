@@ -8,7 +8,7 @@ app=Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/flasql'
-app.config['SECRET_KEY'] = 'some_SUpER_SecREt_str1NG'
+app.config['SECRET_KEY'] = 'jlkiuytfgjhjklhgfdsxcvbnm,kljyutrewsdfbuttshjlkuihytr'
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -32,6 +32,12 @@ class User(db.Model):
   def as_dict(self):
     user_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
     del user_dict['password']
+    # user_dict = {
+    #   'id': self.id,
+    #   'email': self.email,
+    #   'name': self.name,
+    #   'bio': self.bio,
+    # }
     return user_dict
 
   def set_password(self, password):

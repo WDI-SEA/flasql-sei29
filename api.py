@@ -5,7 +5,7 @@ from crud.post_crud import get_all_posts, get_post, create_post, destroy_post, u
 from crud.tag_crud import get_all_tags, get_posts_by_tag, destroy_tag
 from flask_httpauth import HTTPTokenAuth
 from itsdangerous import (TimedJSONWebSignatureSerializer
-                        as Serializer, BadSignature, SignatureExpired)
+                    as Serializer, BadSignature, SignatureExpired)
 
 auth = HTTPTokenAuth('Bearer')
 
@@ -23,8 +23,10 @@ def verify_token(token):
     data = s.loads(token)
     g.user = User.query.filter_by(id=data["id"]).first()
   except SignatureExpired:
+    print(f'⏰ Signature Expired')
     return False # valid token, but expired
   except BadSignature:
+    print(f'🧨 Invalid Token')
     return False # invalid token
   return True
 
@@ -40,19 +42,20 @@ def authenticate():
 
   g.user = user
   token = user.generate_token()
-  return jsonify(user=user.as_dict(), token=token.decode('ascii'), status_code=201)
+  return jsonify(user=user.as_dict(), token=token.decode('ascii'), status_code=200)
 
 
 @app.route('/api/protected')
 @auth.login_required
 def get_resource():
-    return jsonify({ 'data': 'Hello, %s!' % g.user.name })
+  return jsonify({ 'data': 'Hello, %s!' % g.user.name })
 
 @app.route('/users', methods=['GET', 'POST'])
 def user_index_create():
   if request.method == 'GET':
     return get_all_users()
   if request.method == 'POST':
+    print(f'🍑 {request.json}')
     return create_user(**request.json)
 
 @app.route('/users/<int:id>')

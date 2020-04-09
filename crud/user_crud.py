@@ -22,13 +22,14 @@ def get_user(id):
 def create_user(**form_args):
   if not form_args['name'] or not form_args['email'] or not form_args['password']:
     raise Exception('Name, email, and password are required fields')
-  if User.query.filter_by(name=form_args['name']).first() is not None:
+  if User.query.filter_by(email=form_args['email']).first() is not None:
     raise Exception('There is already a user with this email')
 
   new_user = User(**form_args)
   new_user.set_password(form_args['password'])
   db.session.add(new_user)
   db.session.commit()
+  g.user = new_user
   # Authorize the user
   token = new_user.generate_token()
   return jsonify(user=new_user.as_dict(), token=token.decode('ascii'), status_code=201)
